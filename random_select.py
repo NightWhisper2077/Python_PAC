@@ -29,24 +29,10 @@ def read_arr(inp1, inp2):
 
 
 def gen_index(arr, chn, cnt):
-    if random.random() < chn:
+    if random.random() <= chn:
         return arr + cnt
     else:
         return arr
-
-
-def gen_index2(arr, chn):
-    if random.random() < chn:
-        return 0
-    else:
-        return 1
-
-
-def gen_inv(arr):
-    if arr == 1:
-        return 0
-    else:
-        return 1
 
 
 def variant_1():
@@ -55,19 +41,58 @@ def variant_1():
 
     vfun = np.vectorize(gen_index)
     index = vfun(range(count), args.chance, count)
+
+    """Result"""
     print(result[index])
 
+    """Distribution of elements from the second array"""
+    c = []
 
+    for i in range(10000):
+        vfun = np.vectorize(gen_index)
+        index = vfun(range(count), args.chance, count)
+        c.append(len(index[index >= count])/count)
+
+    d = np.array(c)
+    print(d.mean())
 def variant_2():
     np_arr1, np_arr2, count = read_arr(args.input_frs, args.input_scn)
 
-    vfun = np.vectorize(gen_index2)
-    rnd_arr = vfun(range(count), args.chance)
-    vfun = np.vectorize(gen_inv)
+    res = np.random.choice((True, False), count, p=(args.chance, 1-args.chance))
+    np_arr1[res] = np_arr2[res]
 
-    print(np_arr1 * rnd_arr + np_arr2 * vfun(rnd_arr))
+    """Result"""
+    print(np_arr1)
 
+    """Distribution of elements from the second array"""
+    c = []
+
+    for i in range(10000):
+        res = np.random.choice((True, False), count, p=(args.chance, 1 - args.chance))
+        c.append(len(res[res == True]) / count)
+
+    d = np.array(c)
+    print(d.mean())
+
+def variant_3():
+    np_arr1, np_arr2, count = read_arr(args.input_frs, args.input_scn)
+
+    res = np.random.rand(count)
+    np_arr1[res < args.chance] = np_arr2[res < args.chance]
+
+    """Result"""
+    print(np_arr1)
+
+    """Distribution of elements from the second array"""
+    c = []
+
+    for i in range(10000):
+        res = np.random.rand(count)
+        c.append(len(res[res < args.chance]) / count)
+
+    d = np.array(c)
+    print(d.mean())
 
 variant_1()
-
 variant_2()
+variant_3()
